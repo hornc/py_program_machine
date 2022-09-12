@@ -18,7 +18,7 @@ def view_debug(m):
 
 def test_state_vreg_duplicate():
     # x 0 0 ->  0 x x
-    m = ProgramMachine(2)
+    m = ProgramMachine(2, 'COPY')
     x = 4
     r = 2**x
     # set v.reg.2 to x
@@ -28,9 +28,8 @@ def test_state_vreg_duplicate():
     m.inc(1); m.dec(1)
     print('Start:')
     m.show()
-    state = 'COPY'
 
-    while state == 'COPY' and m.dec(0):
+    while m.dec(0, 'COPY'):
         print(f'OUTER LOOP: R0: {prime_decode(m.counters[0])} -- {m.counters[0]}')
         m.inc(0)
         while m.dec(0):
@@ -38,7 +37,7 @@ def test_state_vreg_duplicate():
                 m.inc_by(1, 15)
             else:
                 print('-------Zeroed early!--------')
-                state = 'DONE'
+                m.state = 'DONE'
                 view_debug(m)
                 # Adjust r1 for overshoot from this point:
                 while m.dec_by(1, 15):
@@ -48,7 +47,7 @@ def test_state_vreg_duplicate():
                 while m.dec(0):
                     m.inc(1)
         else:
-            print("------------")
+            print('------------')
             view_debug(m)
             # swap 0d
             while m.dec(1):
