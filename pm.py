@@ -7,46 +7,45 @@ https://esolangs.org/wiki/Portable_Minsky_Machine_Notation
 
 from sympy import nextprime
 
-counters = {}
 
-def inc(counter):
-    counters[counter] = counters.get(counter, 0) + 1
+class ProgramMachine:
+    def __init__(self, registers):
+        self.counters = [0] * registers
 
+    def inc(self, counter):
+        self.counters[counter] += 1
 
-def dec(counter):
-    test = bool(counters[counter])
-    counters[counter] = max(0, counters.get(counter, 0) - 1)
-    return test
+    def dec(self, counter):
+        test = bool(self.counters[counter])
+        if test:
+            self.counters[counter] -= 1
+        return test
 
+    ## Syntactic sugar
+    def inc_by(self, counter, amount):
+        self.counters[counter] += amount
 
-## Syntactic sugar
-def inc_by(counter, amount):
-    counters[counter] = counters.get(counter, 0) + amount 
+    def dec_by(self, counter, amount):
+        test = bool(self.counters[counter])
+        self.counters[counter] = max(0, self.counters[counter] - amount)
+        return test
 
+    ## I/O Extenstion
 
-def dec_by(counter, amount):
-    test = bool(counters[counter])
-    counters[counter] = max(0, counters.get(counter, 0) - amount)
-    return test 
+    def input(self, counter):
+        pass
 
+    def output(self, counter):
+        if self.dec(counter):
+            print(chr(self.counters[counter]))
+            self.counters[counter] = 0
 
-## I/O Extenstion
-
-def input(counter):
-    pass
-
-def output(counter):
-    if dec(counter):
-        print(chr(counters[counter]))
-        counters[counter] = 0
-
-
-## Helper methods, not part of the original spec:
-def show():
-    """Shows all set registers."""
-    print("<Counter Value>")
-    for k,v in counters.items():
-        print(f'< {k}: {v} >')
+    ## Helper methods, not part of the original spec:
+    def show(self):
+        """Shows all set registers."""
+        print("<Counter Value>")
+        for k, v in enumerate(self.counters):
+            print(f'< {k}: {v} >')
 
 
 ## Prime Encoded virtual register helpers:

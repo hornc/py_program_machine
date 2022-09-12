@@ -1,6 +1,5 @@
 import pytest
-from pm import counters, prime_decode, inc, inc_by, dec, dec_by, show
-
+from pm import ProgramMachine, prime_decode
 
 def test_prime_decode():
     assert prime_decode(4) == [2] 
@@ -9,58 +8,52 @@ def test_prime_decode():
     assert prime_decode(2**5 * 5**9) == [5, 0, 9]
 
 
-def test_state_vreg_copy():
-    global counters
-    # or duplicate  x 0 0 ->  0 x x
+def view_debug(m):
+    # Temporary Debugging.
+    print(f'C0: {m.counters[0]}')
+    print(f'C1: {m.counters[1]}')
+    print(f'R0: {prime_decode(m.counters[0])}')
+    print(f'R1: {prime_decode(m.counters[1])}')
+
+
+def test_state_vreg_duplicate():
+    # x 0 0 ->  0 x x
+    m = ProgramMachine(2)
     x = 4
     r = 2**x
     # set v.reg.2 to x
     for i in range(r):
-        inc(0)
+        m.inc(0)
 
-    inc(1); dec(1) 
+    m.inc(1); m.dec(1)
     print('Start:')
-    show()
+    m.show()
     state = 'COPY'
 
-    while state == 'COPY' and dec(0):  # !! needs to be while v.reg.2 ... this currently does not know when to stop
-        print(f'OUTER LOOP: R0: {prime_decode(counters[0])} -- {counters[0]}')
-        inc(0)
-        while dec(0):
-            if dec(0):
-                inc_by(1, 15)
-
+    while state == 'COPY' and m.dec(0):
+        print(f'OUTER LOOP: R0: {prime_decode(m.counters[0])} -- {m.counters[0]}')
+        m.inc(0)
+        while m.dec(0):
+            if m.dec(0):
+                m.inc_by(1, 15)
             else:
                 print('-------Zeroed early!--------')
                 state = 'DONE'
-                print(f'C0: {counters[0]}')
-                print(f'C1: {counters[1]}')
-                print(f'R0: {prime_decode(counters[0])}')
-                print(f'R1: {prime_decode(counters[1])}')
+                view_debug(m)
                 # Adjust r1 for overshoot from this point:
-                #counters[1] = counters[1] // 15 * 2
-                while dec_by(1, 15):
-                    inc(0)
-                    inc(0)
-                inc(0)
-                while dec(0):
-                    inc(1)
-
+                while m.dec_by(1, 15):
+                    m.inc(0)
+                    m.inc(0)
+                m.inc(0)
+                while m.dec(0):
+                    m.inc(1)
         else:
             print("------------")
-            print(f'C0: {counters[0]}')
-            print(f'C1: {counters[1]}')
-            print(f'R0: {prime_decode(counters[0])}')
-            print(f'R1: {prime_decode(counters[1])}')
+            view_debug(m)
             # swap 0d
-            while dec(1):
-                inc(0)
-            #counters[0] = counters[1]
-            #counters[1] = 0
-
-    
-    #counters[0] = counters[0] * 2 + 15  # for [0, x+1, x+1]
-    assert prime_decode(counters[0]) == [0, x, x]
+            while m.dec(1):
+                m.inc(0)
+    assert prime_decode(m.counters[0]) == [0, x, x]
 
 
 def xtest_divide_by_constant():
