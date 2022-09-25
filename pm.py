@@ -66,8 +66,9 @@ def prime_decode(reg):
             r.append(v)
         return r
 
-    def gascii(i, p=2):
-        return ''.join([chr(v) for v in gdecode(i, p)])
 
     return gdecode(reg)
-    #return gascii(reg)
+
+
+def decode_string(reg):
+    return ''.join([chr(v) for v in prime_decode(reg)])
