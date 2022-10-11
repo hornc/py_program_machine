@@ -9,13 +9,18 @@ from sympy import nextprime
 
 
 class ProgramMachine:
-    def __init__(self, registers):
+    def __init__(self, registers, initial_state=None):
         self.counters = [0] * registers
+        # Hold a concept of 'state' to simulate arbitrary instruction jumps
+        # as in Minsky's original description, but not present in PMMN.
+        self.state = initial_state
 
     def inc(self, counter):
         self.counters[counter] += 1
 
-    def dec(self, counter):
+    def dec(self, counter, state=None):
+        if state and state != self.state:
+            return False
         test = bool(self.counters[counter])
         if test:
             self.counters[counter] -= 1
@@ -25,7 +30,9 @@ class ProgramMachine:
     def inc_by(self, counter, amount):
         self.counters[counter] += amount
 
-    def dec_by(self, counter, amount):
+    def dec_by(self, counter, amount, state=None):
+        if state and state != self.state:
+            return False
         test = bool(self.counters[counter])
         self.counters[counter] = max(0, self.counters[counter] - amount)
         return test
