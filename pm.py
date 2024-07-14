@@ -50,7 +50,7 @@ class ProgramMachine:
 
 ## Prime Encoded virtual register helpers:
 
-def prime_decode(reg):
+def prime_decode(reg: int) -> list:
     """
     Decodes a single register value into a list of
     multiple prime-encoded values (a string, if used for output).
@@ -65,10 +65,21 @@ def prime_decode(reg):
             p = nextprime(p)
             r.append(v)
         return r
-
-
     return gdecode(reg)
 
 
 def decode_string(reg):
     return ''.join([chr(v) for v in prime_decode(reg)])
+
+
+def prime_encode(vregs: list) -> int:
+    """
+    Encodes a list of virtual registers into
+    a single prime encoded register value.
+    """
+    r = 1
+    p = 2
+    for v in vregs:
+        r *= p ** v
+        p = nextprime(p)
+    return r
