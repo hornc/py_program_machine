@@ -55,7 +55,7 @@ def ack_reg(m, n, cellwidth=10**5):
     """
     reg = n
     reg += m * cellwidth
-    once = True  # we have to run through this at least one, even if m = 0
+    once = True  # we have to run through this at least once, when m = 0
                  # TODO: we can handle this more directly outside the while loop...
                  # refactor...
     while once or reg // cellwidth:
