@@ -83,3 +83,11 @@ def prime_encode(vregs: list) -> int:
         r *= p ** v
         p = nextprime(p)
     return r
+
+
+def primen(n):
+    """Return the nth prime (zero indexed)."""
+    p = 2
+    for i in range(n):
+        p = nextprime(p)
+    return p
