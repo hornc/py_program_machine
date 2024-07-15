@@ -44,6 +44,44 @@ def A(m, n):  # Ackermann function (2 argument)
     return A(m-1, A(m, n-1))
 
 
+# Because we can't do recursion and don't have stacks in a register machine
+# this is more like the function we are trying to implement:
+def ack_reg(m, n, cellwidth=10**5):
+    """
+    Non-recursive Ackermann function which uses a single register
+    to simulate a stack (with cell width = cellwidth),
+    Base algorithm taken from Rosetta code:
+    https://rosettacode.org/wiki/Ackermann_function#Python:_Without_recursive_function_calls
+    """
+    reg = n
+    reg += m * cellwidth
+    once = True  # we have to run through this at least one, even if m = 0
+                 # TODO: we can handle this more directly outside the while loop...
+                 # refactor...
+    while once or reg // cellwidth:
+        once = False
+        m = reg // cellwidth - (reg // cellwidth ** 2) * cellwidth
+        n = reg - reg // cellwidth * cellwidth
+        print(m, n, 'reg:', reg)
+        reg = reg // cellwidth ** 2  # pop 2 cells
+        reg *= cellwidth  # we're going to append at least one element
+        if m == 0:
+            reg += n + 1
+        elif m == 1:
+            reg += n + 2
+        elif m == 2:
+            reg += 2 * n + 3
+        elif m == 3:
+            reg += 2**(n + 3) - 3
+        elif n == 0:
+            reg *= cellwidth
+            reg += (m-1) * cellwidth + 1
+        else:
+            reg *= cellwidth**2
+            reg += (m-1) * cellwidth**2 + m * cellwidth + n - 1
+    return reg
+
+
 def main():
     m = VProgramMachine(2)
 
@@ -63,6 +101,12 @@ def main():
     if m.vdec(1):
         # m is not 0
         m.vinc(1)  # restore 1 after the test
+        if m.vdec(2): # n != 0
+            # we want n to dec here, leave it alone for now
+            print('return A(m-1, A(m, n-1))')
+        else:  # n == 0
+            print('return A(m-1, 1)')
+            # return A(m-1, 1)
     else:
         # m is 0
         # return n + 1
